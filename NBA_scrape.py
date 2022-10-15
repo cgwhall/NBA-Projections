@@ -11,46 +11,43 @@ from bs4 import BeautifulSoup as bs
 import pandas as pd
 import time
 
-# Get URL
-URL = "https://www.basketball-reference.com/leagues/NBA_2022_per_game.html#per_game_stats"
-page = requests.get(URL)
+# # Get URL
+# URL = "https://www.basketball-reference.com/leagues/NBA_2022_per_game.html#per_game_stats"
+# page = requests.get(URL)
 
-# print(page.text)
+# # print(page.text)
 
-#Create Soup Object
-soup = bs(page.content, "html.parser")
-
-
-# Create table soup object
-table = soup.find(id="per_game_stats")
-
-## Scrape table header row
-table_head = table.find('thead')
-header = table_head.find_all('th')
-
-categories = [header[cat]['aria-label'] for cat in range(len(header))]
-
-season_stats = pd.DataFrame(columns = categories[1:]) 
-
-## Scrape table rows
-tbody = soup.find('tbody')
-rows = tbody.find_all('tr') 
-for row in rows:
-    cols=row.find_all('td')
-    if len(cols) < 1:
-        pass
-    else:
-        cols=[stat.text.strip() for stat in cols]  # https://datascience.stackexchange.com/questions/10857/how-to-scrape-a-table-from-a-webpage
-        season_stats.loc[len(season_stats)] = cols
-        print(cols)
+# #Create Soup Object
+# soup = bs(page.content, "html.parser")
 
 
-len(season_stats.columns)
+# # Create table soup object
+# table = soup.find(id="per_game_stats")
+
+# ## Scrape table header row
+# table_head = table.find('thead')
+# header = table_head.find_all('th')
+
+# categories = [header[cat]['aria-label'] for cat in range(len(header))]
+
+# season_stats = pd.DataFrame(columns = categories[1:]) 
+
+# ## Scrape table rows
+# tbody = soup.find('tbody')
+# rows = tbody.find_all('tr') 
+# for row in rows:
+#     cols=row.find_all('td')
+#     if len(cols) < 1:
+#         pass
+#     else:
+#         cols=[stat.text.strip() for stat in cols]  # https://datascience.stackexchange.com/questions/10857/how-to-scrape-a-table-from-a-webpage
+#         season_stats.loc[len(season_stats)] = cols
+#         print(cols)
+
+
+# len(season_stats.columns)
 
 # AUTOMATED
-
-year_range=[*range(2018,2023)] #https://www.geeksforgeeks.org/range-to-a-list-in-python/
-year_range
 
 # def start_df(URL):
 #     URL = 'https://www.basketball-reference.com/leagues/NBA_2022_per_game.html#per_game_stats'
@@ -69,19 +66,19 @@ year_range
 
 ##### Actually works, LFG!
 def scrape_seasons(year_range):
-    def start_df(URL='https://www.basketball-reference.com/leagues/NBA_2022_per_game.html#per_game_stats'):
+    def empty_df(URL='https://www.basketball-reference.com/leagues/NBA_2022_per_game.html#per_game_stats'):
         page = requests.get(URL)
-        soup = bs(page.content, 'lxml')
-        table = soup.find(id="per_game_stats")
+        soup_obj = bs(page.content, 'lxml')
+        table = soup_obj.find(id="per_game_stats")
         table_head = table.find('thead')
         header = table_head.find_all('th')
         categories = [header[cat]['aria-label'] for cat in range(len(header))]
-        season_stats = pd.DataFrame(columns = categories[1:])
-        season_stats['season'] = []
+        stats_df = pd.DataFrame(columns = categories[1:])
+        stats_df['season'] = []
         return season_stats
-    df = start_df()
+    df = empty_df()
     for year in year_range:
-        print(f'time for {year}\'s stats')
+        print(f'scraping {year}\'s stats')
         URL = f'https://www.basketball-reference.com/leagues/NBA_{year}_per_game.html#per_game_stats'
         page = requests.get(URL)
         time.sleep(5)
@@ -102,6 +99,11 @@ def scrape_seasons(year_range):
         print(f'{year} stats scraped and added!')
     return season_stats
 
-df = scrape_seasons(year_range)
+# Create year range list
+year_range=[*range(2018,2023)] #https://www.geeksforgeeks.org/range-to-a-list-in-python/
+year_range
+
+
+player_stats_df = scrape_seasons(year_range)
 
 
